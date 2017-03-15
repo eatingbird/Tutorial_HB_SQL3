@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, redirect
+from flask import Flask, request, render_template, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 
 import hackbright
@@ -22,7 +22,7 @@ connect_to_db(app)
 def get_student():
     """Show information about a student."""
 
-    github = request.args.get('github', 'jhacks')
+    github = request.args.get('github')
     first, last, github = hackbright.get_student_by_github(github)
 
     html = render_template("student_info.html",
@@ -47,16 +47,16 @@ def student_add():
     last_name = request.form.get('last_name')
     github = request.form.get('github')
 
-    sql = """INSERT INTO students (first_name, last_name, github)
-                VALUES (:first_name, :last_name, :github)
-          """
-    db.session.execute(sql, {'first_name': first_name,
-                             'last_name': last_name,
-                             'github': github})
-    db.session.commit()
+    hackbright.make_new_student(first_name, last_name, github)
 
     print "New student generated."
-    return redirect("/student-added-success")
+
+    # # Solution1
+    # return render_template("student_added.html", github=github)
+
+    # Solution 2 URL FOR
+    print url_for('new_student_success', github=github)
+    return redirect(url_for('new_student_success', github=github))
 
 
 @app.route("/student-form")
@@ -72,6 +72,26 @@ def new_student_success():
 
     github = request.args.get('github')
     return render_template("student_added.html", github=github)
+
+"""
+# Solution 3
+@add.route("/student/<github>")
+def show_student(github):
+    return render_template(github=github)
+
+/student-serach-process
+    #GET
+    will change into 
+    return redirect student URL FOR(show_student, github=github)
+    because you are passing github
+
+/student-add-process
+    #POST
+    #process add form 
+    return redirect to student (URL FOR)
+    because you are passing github
+
+"""    
 
 
 if __name__ == "__main__":

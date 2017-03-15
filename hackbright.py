@@ -95,6 +95,7 @@ def assign_grade(github, title, grade):
     print "Successfully assigned grade of %s for %s in %s" % (
         grade, github, title)
 
+
 def get_grades_by_github(github):
     """Get a list of all grades for a student by their github username"""
     QUERY = """
